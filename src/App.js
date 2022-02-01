@@ -12,15 +12,15 @@ function App() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if(!editMode){
-    console.log("Item submitted: " + currentInput);
-    setItemList([...itemList, { text: currentInput, id: itemCreatedCount }])
-    setItemCreatedCount(preVal => preVal + 1);
+    if (!editMode) {
+      console.log("Item submitted: " + currentInput);
+      setItemList([...itemList, { text: currentInput, id: itemCreatedCount }])
+      setItemCreatedCount(preVal => preVal + 1);
     }
-    else{
+    else {
       const newItemList = itemList.map((item) => {
-        if(item.id === item2EditId){
-          return {...item, text: currentInput}
+        if (item.id === item2EditId) {
+          return { ...item, text: currentInput }
         }
         return item;
       })
@@ -38,6 +38,11 @@ function App() {
     setCurrentInput(item2Edit.text);
   }
 
+  const deleteItemWithId = (id) => {
+    const newItemList = itemList.filter((item) => item.id !== id);
+    setItemList(newItemList);
+  }
+
   return (
     <section className='section-center'>
       <h2>Grocery Bud</h2>
@@ -48,12 +53,12 @@ function App() {
             value={currentInput}
             onChange={(e) => setCurrentInput(e.target.value)}
           />
-          <button>Submit</button>
+          <button>{editMode ? "Edit Item" : "Add Item"}</button>
         </div>
       </form>
 
       <div className='grocery-container'>
-        <List items={itemList} editItem={editItemWithId} />
+        <List items={itemList} editItemAction={editItemWithId} deleteItemAction={deleteItemWithId} />
       </div>
 
     </section>
