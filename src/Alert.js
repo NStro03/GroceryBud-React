@@ -1,7 +1,17 @@
 import React, { useEffect } from 'react'
 
-const Alert = () => {
-  return <h2>alert component</h2>
+const Alert = ({data, hideAlertAction}) => {
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      hideAlertAction();
+    }, 2000);
+  
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [data]);
+  
+  return <h2>{data.text}</h2>
 }
 
 export default Alert

@@ -1,21 +1,28 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import List from './List'
 import Alert from './Alert'
 
+var itemCreatedCount = 1;
 function App() {
   const [currentInput, setCurrentInput] = useState("");
   const [itemList, setItemList] = useState([]);
-  const [itemCreatedCount, setItemCreatedCount] = useState(1);
   // Editing States
   const [editMode, setEditMode] = useState(false);
   const [item2EditId, setItem2EditId] = useState(null);
+  // Alert State
+  const [alert, setAlert] = useState({ text: "", type: null, isShowing: false });
+  // const [showAlert, setShowAlert] = useState(false);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    if (!editMode) {
+    if (!currentInput) {
+      showAlert("Please fill the item name", "danger")
+    }
+    else if (!editMode) {
       console.log("Item submitted: " + currentInput);
       setItemList([...itemList, { text: currentInput, id: itemCreatedCount }])
-      setItemCreatedCount(preVal => preVal + 1);
+      itemCreatedCount++;
+      showAlert("Item Added", "success");
     }
     else {
       const newItemList = itemList.map((item) => {
@@ -27,8 +34,10 @@ function App() {
       setItemList(newItemList);
       setEditMode(false);
       setItem2EditId(null);
+      showAlert("Item Updated", "success");
     }
     setCurrentInput("");
+    e.target.focus();
   }
 
   const editItemWithId = (id) => {
@@ -43,10 +52,18 @@ function App() {
     setItemList(newItemList);
   }
 
+  const showAlert = (text, type) => {
+    setAlert({text: text, type: type, isShowing: true})
+  }
+
+  const hideAlert = () => {
+    setAlert(preVal=> ({...preVal, isShowing: false}))
+  }
   return (
     <section className='section-center'>
       <h2>Grocery Bud</h2>
       <form className='form' onSubmit={submitHandler}>
+        {alert.isShowing && <Alert data={alert} hideAlertAction={hideAlert} />}
         <div className='form-control'>
           <input id='itemToAdd'
             type='text'

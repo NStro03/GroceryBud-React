@@ -1,7 +1,7 @@
 import React from 'react'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 function List({ items, editItemAction, deleteItemAction }) {
-
+  console.log(items)
   const listItems = items.map((item) => {
     return (
       <div className='grocery-item' key={item.id}>
