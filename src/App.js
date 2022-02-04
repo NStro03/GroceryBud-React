@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid';
+// Local imports
 import List from './List'
 import Alert from './Alert'
 
-let itemCreatedCount = 1;
+function getSavedList() {
+  let savedlist = localStorage.getItem("itemList")
+  if (savedlist) {
+    return JSON.parse(savedlist)
+  }
+  return []
+}
+
 function App() {
   const [currentInput, setCurrentInput] = useState("");
   const [itemList, setItemList] = useState(getSavedList());
@@ -11,19 +20,14 @@ function App() {
   const [item2EditId, setItem2EditId] = useState(null);
   // Alert State
   const [alert, setAlert] = useState({ text: "", type: null, isShowing: false });
-  // const [showAlert, setShowAlert] = useState(false);
+
+  const itemToAddInputRef = React.createRef();
 
   useEffect(() => {
     localStorage.setItem('itemList', JSON.stringify(itemList));
   }, [itemList]);
 
-  function getSavedList() {
-    let savedlist = localStorage.getItem("itemList")
-    if (savedlist) {
-      return JSON.parse(savedlist)
-    }
-    return []
-  }
+
   const submitHandler = (e) => {
     e.preventDefault();
     if (!currentInput) {
@@ -31,8 +35,7 @@ function App() {
     }
     else if (!editMode) {
       console.log("Item submitted: " + currentInput);
-      setItemList([...itemList, { text: currentInput, id: itemCreatedCount }])
-      itemCreatedCount++;
+      setItemList([...itemList, { text: currentInput, id: uuidv4() }])
       showAlert("Item Added", "success");
     }
     else {
@@ -48,7 +51,7 @@ function App() {
       showAlert("Item Updated", "success");
     }
     setCurrentInput("");
-    e.target.focus();
+    itemToAddInputRef.current.focus();
   }
 
   const editItemWithId = (id) => {
@@ -56,12 +59,14 @@ function App() {
     const item2Edit = itemList.find((item) => item.id === id);
     setItem2EditId(item2Edit.id);
     setCurrentInput(item2Edit.text);
+    itemToAddInputRef.current.focus();
   }
 
   const deleteItemWithId = (id) => {
     const newItemList = itemList.filter((item) => item.id !== id);
     setItemList(newItemList);
     showAlert("Item deleted", "danger")
+    itemToAddInputRef.current.focus();
   }
 
   const showAlert = (text, type) => {
@@ -74,8 +79,8 @@ function App() {
 
   const clearItemsList = () => {
     setItemList([]);
-    itemCreatedCount = 1;
     showAlert("List is now Empty", "danger");
+    itemToAddInputRef.current.focus();
   }
 
   return (
@@ -85,6 +90,7 @@ function App() {
         <h3>Grocery Bud</h3>
         <div className='form-control'>
           <input id='itemToAdd'
+            ref={itemToAddInputRef}
             type='text'
             className='grocery'
             placeholder='eg: Wheat'
